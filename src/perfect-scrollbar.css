@@ -21,6 +21,10 @@
     transition: opacity .2s linear;
 }
 
+.ps-container.ie6 .ps-scrollbar-x {
+    font-size: 0; /* fixed scrollbar height in xp sp3 ie6 */
+}
+
 .ps-container:hover .ps-scrollbar-x,
 .ps-container.hover .ps-scrollbar-x {
     opacity: 0.6;
@@ -56,13 +60,17 @@
     transition: opacity .2s linear;
 }
 
+.ps-container.ie .ps-scrollbar-y {
+    font-size: 0; /* fixed scrollbar height in xp sp3 ie6 */
+}
+
 .ps-container:hover .ps-scrollbar-y,
 .ps-container.hover .ps-scrollbar-y {
     opacity: 0.6;
     filter: alpha(opacity = 60);
 }
 
-.ps-container .ps-scrollbar-y:hover ,
+.ps-container .ps-scrollbar-y:hover,
 .ps-container .ps-scrollbar-y.hover {
     opacity: 0.9;
     filter: alpha(opacity = 90);

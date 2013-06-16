@@ -66,6 +66,11 @@
         $scrollbarY.css({right: scrollbarYRight - scrollLeft});
       };
 
+      var updateScrollbarCss = function () {
+        $scrollbarX.css({left: scrollbarXLeft + $this.scrollLeft(), bottom: scrollbarXBottom - $this.scrollTop(), width: scrollbarXWidth});
+        $scrollbarY.css({top: scrollbarYTop + $this.scrollTop(), right: scrollbarYRight - $this.scrollLeft(), height: scrollbarYHeight});
+      };
+
       var updateBarSizeAndPosition = function () {
         containerWidth = $this.width();
         containerHeight = $this.height();
@@ -97,8 +102,7 @@
           scrollbarXLeft = containerWidth - scrollbarXWidth;
         }
 
-        $scrollbarX.css({left: scrollbarXLeft + $this.scrollLeft(), bottom: scrollbarXBottom - $this.scrollTop(), width: scrollbarXWidth});
-        $scrollbarY.css({top: scrollbarYTop + $this.scrollTop(), right: scrollbarYRight - $this.scrollLeft(), height: scrollbarYHeight});
+        updateScrollbarCss();
       };
 
       var moveBarX = function (currentLeft, deltaX) {
@@ -309,19 +313,42 @@
 
       var ieSupport = function (version) {
         $this.addClass('ie').addClass('ie' + version);
-        if (version === 6) {
-          var mouseenter = function () { 
+
+        var bindHoverHandlers = function () {
+          var mouseenter = function () {
             $(this).addClass('hover');
           };
           var mouseleave = function () {
             $(this).removeClass('hover');
           };
-          $this.bind('mouseenter.perfect-scroll', mouseenter)
-            .bind('mouseleave.perfect-scroll', mouseleave);
-          $scrollbarX.bind('mouseenter.perfect-scroll', mouseenter)
-            .bind('mouseleave.perfect-scroll', mouseleave);
-          $scrollbarY.bind('mouseenter.perfect-scroll', mouseenter)
-            .bind('mouseleave.perfect-scroll', mouseleave);
+          $this.bind('mouseenter.perfect-scroll', mouseenter).bind('mouseleave.perfect-scroll', mouseleave);
+          $scrollbarX.bind('mouseenter.perfect-scroll', mouseenter).bind('mouseleave.perfect-scroll', mouseleave);
+          $scrollbarY.bind('mouseenter.perfect-scroll', mouseenter).bind('mouseleave.perfect-scroll', mouseleave);
+        };
+
+        var fixIe6ScrollbarPosition = function () {
+          updateScrollbarCss = function () {
+            $scrollbarX.css({left: scrollbarXLeft + $this.scrollLeft(), bottom: scrollbarXBottom, width: scrollbarXWidth});
+            $scrollbarY.css({top: scrollbarYTop + $this.scrollTop(), right: scrollbarYRight, height: scrollbarYHeight});
+            $scrollbarX.hide().show();
+            $scrollbarY.hide().show();
+          };
+          updateContentScrollTop = function () {
+            var scrollTop = parseInt(scrollbarYTop * contentHeight / containerHeight, 10);
+            $this.scrollTop(scrollTop);
+            $scrollbarX.css({bottom: scrollbarXBottom});
+            $scrollbarX.hide().show();
+          };
+          updateContentScrollLeft = function () {
+            var scrollLeft = parseInt(scrollbarXLeft * contentWidth / containerWidth, 10);
+            $this.scrollLeft(scrollLeft);
+            $scrollbarY.hide().show();
+          };
+        };
+
+        if (version === 6) {
+          bindHoverHandlers();
+          fixIe6ScrollbarPosition();
         }
       };
 
@@ -330,7 +357,7 @@
       var initialize = function () {
         var ieMatch = navigator.userAgent.toLowerCase().match(/(msie) ([\w.]+)/);
         if (ieMatch && ieMatch[1] === 'msie') {
-          //must be executed at first, because 'ieSupport' may addClass to the container
+          // must be executed at first, because 'ieSupport' may addClass to the container
           ieSupport(parseInt(ieMatch[2], 10));
         }
 
